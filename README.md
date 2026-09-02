@@ -1,92 +1,416 @@
-# Centro de Control Operacional con SQL Server y Power BI
+#  Centro de Control Operacional | SQL Server + Power BI
 
-Este proyecto lo desarrollé para practicar un proceso completo de análisis de datos, comenzando con la creación y validación de una base de datos en SQL Server y terminando con un reporte interactivo en Power BI.
+Este proyecto nació de una idea sencilla: simular cómo podría hacerse el seguimiento de muchas operaciones desde un solo lugar.
 
-El caso representa un centro de control encargado de realizar el seguimiento de operaciones, revisar el cumplimiento del SLA e identificar operaciones vencidas o en riesgo. Para desarrollar el proyecto trabajé con 500 operaciones simuladas, por lo que no se utilizó información confidencial ni datos de una empresa real.
+Quería trabajar algo más completo que solo crear gráficos en Power BI. Mi objetivo fue empezar desde los datos: crear la base en SQL Server, organizar las tablas, revisar que la información estuviera correcta, preparar consultas y luego llevar todo ese trabajo a un dashboard.
 
-## Objetivo del proyecto
+El caso representa un centro de control donde se necesita saber qué está pasando con las operaciones: cuáles siguen abiertas, cuáles ya cerraron, cuáles están por vencer y cuáles necesitan atención.
 
-El objetivo principal fue construir una solución que permita organizar y analizar la información operativa de una manera clara. El reporte ayuda a responder preguntas como:
+Para trabajar el caso preparé **500 operaciones simuladas**. Todos los datos fueron creados únicamente para este proyecto y no pertenecen a ninguna empresa real.
 
-* ¿Cuántas operaciones están abiertas o cerradas?
-* ¿Qué porcentaje cumple con el SLA?
-* ¿Cuántas operaciones están vencidas o en riesgo?
-* ¿Qué áreas y responsables tienen mayor carga de trabajo?
-* ¿Cuánto tiempo demora la atención de las operaciones?
-* ¿Cuál es el estado de una operación específica?
+---
 
-## Herramientas utilizadas
+##  Tecnologías que usé
 
-* SQL Server para crear la base de datos, las tablas y las consultas.
-* SQL Server Management Studio para ejecutar y validar los scripts.
-* Power BI Desktop para desarrollar el reporte.
-* Power Query para preparar y cargar la información.
-* DAX para crear indicadores y medidas.
-* Word para documentar el desarrollo del proyecto.
+Durante el proyecto trabajé principalmente con:
 
-## Desarrollo de la base de datos
+- **SQL Server**
+- **SQL Server Management Studio**
+- **T-SQL**
+- **Power BI Desktop**
+- **Power Query**
+- **DAX**
+- **GitHub**
 
-Primero creé la base de datos `DB_GestionOperacional`. Para organizar la información utilicé un modelo estrella compuesto por una tabla principal y cuatro tablas de dimensiones:
+Cada herramienta tuvo una función distinta dentro del proyecto. SQL Server fue la base para organizar y consultar la información, mientras que Power BI fue la parte visual donde terminé construyendo el seguimiento de las operaciones.
 
-* `Fact_Operaciones`
-* `Dim_Area`
-* `Dim_Responsable`
-* `Dim_Estado`
-* `Dim_Prioridad`
+---
 
-La tabla principal contiene información como el identificador de la operación, fechas de creación y cierre, área, responsable, estado, prioridad, canal de ingreso, horas de SLA y tiempo de atención.
+##  Vista general del dashboard
 
-Después cargué 500 operaciones simuladas para contar con información suficiente para realizar las consultas y construir el reporte.
+![Resumen Ejecutivo](Proyecto_GestionOperacional/2.-POWER%20BI/CAPTURAS/dashboard-resumen-ejecutivo.png)
 
-## Validación de los datos
+Esta es la primera página del dashboard y también la que usaría para comenzar cualquier revisión.
 
-Antes de utilizar la información en Power BI, preparé consultas para comprobar la calidad de los datos. Entre las principales validaciones revisé:
+La preparé pensando en una pregunta bastante simple:
 
-* Operaciones duplicadas.
-* Campos obligatorios vacíos.
-* Fechas incorrectas.
-* Operaciones cerradas sin fecha de cierre.
-* Valores de SLA inválidos.
-* Registros sin relación con las tablas de dimensiones.
-* Estados y prioridades fuera de los valores permitidos.
+**Si abro el reporte, ¿qué necesito saber primero?**
 
-También creé vistas SQL para facilitar el análisis y procedimientos almacenados para consultar operaciones por estado, revisar alertas y analizar el cumplimiento del SLA.
+Por eso coloqué los indicadores principales en la parte superior.
 
-## Indicadores desarrollados
+En la vista general se muestran:
 
-En Power BI preparé medidas para mostrar los principales resultados del centro de control:
+- **500 operaciones analizadas**
+- **260 operaciones cerradas**
+- **240 operaciones abiertas**
+- **80 % de cumplimiento del SLA**
+- **60 operaciones vencidas**
+- **40 operaciones en riesgo**
 
-* Total de operaciones.
-* Operaciones abiertas.
-* Operaciones cerradas.
-* Porcentaje de cumplimiento del SLA.
-* Operaciones vencidas.
-* Operaciones en riesgo.
-* Tiempo promedio de cierre.
+Desde la misma página también puedo revisar cómo se distribuyen las operaciones por estado y por área, y cómo ha cambiado su cantidad con el paso de los meses.
 
-Los indicadores cambian de acuerdo con los filtros seleccionados y permiten analizar la información por área, prioridad, estado, responsable y fecha.
+Los filtros de **área** y **prioridad** me permiten concentrarme en una parte específica de la información cuando necesito revisar algo con más detalle.
 
-## Páginas del reporte
+---
 
-El reporte está organizado en cuatro páginas:
+##  ¿Qué quería resolver?
 
-### 1. Resumen
+Mientras desarrollaba el proyecto traté de pensar en una situación parecida a la que podría encontrarse en un entorno de trabajo.
 
-Presenta los principales indicadores y una visión general de la situación de las operaciones.
+Imaginemos que existen cientos de operaciones y varias personas necesitan hacerles seguimiento.
 
-### 2. SLA y alertas
+Ahí empiezan a aparecer preguntas como:
 
-Permite identificar las operaciones vencidas, las que se encuentran en riesgo y el nivel de cumplimiento del SLA.
+- ¿Cuántas operaciones siguen abiertas?
+- ¿Cuántas ya se cerraron?
+- ¿Estamos cumpliendo los tiempos acordados?
+- ¿Qué operaciones ya están vencidas?
+- ¿Cuáles están cerca de tener problemas?
+- ¿Qué área tiene más carga?
+- ¿Qué responsable tiene más operaciones?
+- ¿Qué casos deberían revisarse primero?
+- ¿Qué pasó exactamente con una operación determinada?
 
-### 3. Gestión operativa
+Mi idea fue construir el proyecto alrededor de esas preguntas.
 
-Muestra la distribución de las operaciones por área, responsable, estado y prioridad. Esta página ayuda a revisar la carga de trabajo.
+No quería que el dashboard quedara solamente como una colección de gráficos. Quería que cada página tuviera un propósito y que permitiera ir desde una visión general hasta el detalle de una operación.
 
-### 4. Detalle
+---
 
-Permite buscar una operación mediante su `OperacionID` y consultar toda la información relacionada con ella.
+##  Creación de la base de datos
 
-## Estructura del repositorio
+El proyecto comienza en SQL Server.
+
+Primero creé la base:
+
+`DB_GestionOperacional`
+
+Después organicé la información en una tabla principal y cuatro tablas de dimensiones.
+
+### Tabla principal
+
+`Fact_Operaciones`
+
+Esta tabla contiene la información de cada operación, como:
+
+- identificador;
+- fechas;
+- responsable;
+- área;
+- estado;
+- prioridad;
+- canal de ingreso;
+- horas de SLA;
+- tiempo de atención.
+
+### Dimensiones
+
+`Dim_Area`  
+`Dim_Responsable`  
+`Dim_Estado`  
+`Dim_Prioridad`
+
+Separé estos datos para no guardar toda la información repetida dentro de una sola tabla.
+
+También quería practicar una estructura que después pudiera conectarse de manera ordenada con Power BI.
+
+Una vez creadas las tablas y sus relaciones cargué las **500 operaciones simuladas** con las que trabajé durante todo el proyecto.
+
+---
+
+##  Antes de analizar, revisé los datos
+
+Una parte que quería incluir sí o sí era la validación.
+
+Podría haber cargado los datos directamente a Power BI y empezar a crear gráficos, pero preferí revisar primero si existían problemas en la información.
+
+Preparé consultas SQL para buscar:
+
+- operaciones duplicadas;
+- campos obligatorios sin información;
+- fechas incorrectas;
+- operaciones cerradas sin fecha de cierre;
+- valores de SLA incorrectos;
+- registros sin relación con sus dimensiones;
+- estados fuera de los valores esperados;
+- prioridades fuera de los valores esperados.
+
+Esta parte me ayudó a trabajar con una idea que considero básica en análisis de datos:
+
+**un reporte puede verse bien, pero si los datos están mal, el análisis también estará mal.**
+
+---
+
+##  Trabajo realizado en SQL
+
+SQL Server no lo usé solamente para guardar las tablas.
+
+También preparé vistas y procedimientos almacenados para trabajar la información de una forma más ordenada.
+
+### Vista analítica
+
+Creé:
+
+`vw_OperacionAnalitica`
+
+La idea de esta vista fue reunir en una misma consulta la información que necesitaba para analizar las operaciones.
+
+Desde ahí puedo trabajar con datos como:
+
+- área;
+- responsable;
+- estado;
+- prioridad;
+- información del SLA.
+
+En lugar de repetir varias uniones entre tablas cada vez que necesitaba consultar algo, podía partir de una vista ya preparada.
+
+### Procedimientos almacenados
+
+También creé:
+
+`sp_ObtenerOperacionesPorEstado`
+
+Lo preparé para consultar operaciones según su estado.
+
+`sp_ObtenerAlertasOperacionales`
+
+Lo usé para identificar casos que necesitan atención.
+
+`sp_ResumenCumplimientoSLA`
+
+Lo preparé para revisar los resultados relacionados con el cumplimiento del SLA.
+
+Con esta parte del proyecto quise practicar SQL no solamente desde consultas `SELECT`, sino también trabajando con objetos que podrían tener sentido dentro de una base de datos operacional.
+
+---
+
+##  ¿Cómo pasé de SQL Server a Power BI?
+
+Después de preparar y revisar los datos, conecté SQL Server con Power BI.
+
+Antes de crear las visualizaciones pasé por Power Query, donde revisé la información que iba a cargar al modelo y los tipos de datos de las columnas.
+
+Luego trabajé las relaciones del modelo y las medidas DAX necesarias para construir los indicadores.
+
+El recorrido del proyecto quedó así:
+
+```text
+500 operaciones simuladas
+          ↓
+      SQL Server
+          ↓
+   Tablas y relaciones
+          ↓
+  Validación de datos
+          ↓
+Vistas y consultas SQL
+          ↓
+      Power Query
+          ↓
+    Modelo de datos
+          ↓
+         DAX
+          ↓
+       Power BI
+          ↓
+Dashboard operacional
+```
+
+Esta parte fue interesante porque pude ver cómo cada etapa depende de la anterior.
+
+El dashboard es el resultado visible, pero detrás están las tablas, relaciones, validaciones, consultas y medidas que hacen posible el análisis.
+
+---
+
+##  Indicadores que trabajé
+
+Para el dashboard preparé medidas relacionadas con el seguimiento de las operaciones.
+
+Entre ellas están:
+
+- Total de operaciones
+- Operaciones abiertas
+- Operaciones cerradas
+- Cumplimiento del SLA
+- Operaciones vencidas
+- Operaciones en riesgo
+- Operaciones pendientes
+- Operaciones en proceso
+- Operaciones críticas
+- Tiempo de atención
+
+Los resultados cambian según los filtros aplicados en cada página.
+
+Esto me permite revisar, por ejemplo, solamente un área, una prioridad o un responsable sin tener que crear otro reporte.
+
+---
+
+#  Las cuatro páginas del dashboard
+
+Quise dividir el dashboard en cuatro partes.
+
+La lógica que seguí fue:
+
+**primero entender qué está pasando → después revisar los problemas → luego ver dónde concentrar la atención → finalmente revisar un caso específico.**
+
+---
+
+## 1️ Resumen Ejecutivo
+
+![Resumen Ejecutivo](Proyecto_GestionOperacional/2.-POWER%20BI/CAPTURAS/dashboard-resumen-ejecutivo.png)
+
+Esta página responde principalmente a:
+
+**¿Cómo estamos en este momento?**
+
+Aquí puedo ver rápidamente los indicadores generales y tener una primera lectura de la situación.
+
+También puedo comparar las operaciones por estado y por área.
+
+En la parte inferior incluí la evolución mensual para tener una referencia de cómo fue cambiando el volumen de operaciones.
+
+No quise cargar esta primera página con demasiados detalles. La idea es entrar, mirar los números principales y saber si existe algo que merece una revisión más cercana.
+
+---
+
+## 2️ SLA y Alertas
+
+![SLA y Alertas](Proyecto_GestionOperacional/2.-POWER%20BI/CAPTURAS/dashboard-sla-alertas.png)
+
+Después del resumen quería responder otra pregunta:
+
+**¿Estamos cumpliendo los tiempos?**
+
+Esta página se concentra en el SLA.
+
+De las **260 operaciones cerradas**:
+
+- **208 terminaron dentro del SLA**
+- **52 terminaron fuera del SLA**
+
+El resultado general es un **80 % de cumplimiento**.
+
+También puedo comparar el porcentaje entre las distintas áreas.
+
+Más abajo coloqué una tabla con las operaciones que necesitan atención.
+
+Ahí puedo revisar:
+
+- `OperacionID`
+- estado;
+- prioridad;
+- área;
+- responsable;
+- fecha de compromiso;
+- horas de SLA;
+- situación del plazo;
+- comentario.
+
+Esta tabla es especialmente útil porque permite pasar del porcentaje general a los casos concretos que están generando el problema.
+
+---
+
+## 3️ Gestión Operativa
+
+![Gestión Operativa](Proyecto_GestionOperacional/2.-POWER%20BI/CAPTURAS/dashboard-gestion-operativa.png)
+
+En esta página cambié un poco el enfoque.
+
+Ya no quería saber solamente cuántas operaciones existen, sino:
+
+**¿Dónde debería poner atención primero?**
+
+Actualmente el reporte muestra:
+
+- **240 operaciones abiertas**
+- **70 pendientes**
+- **70 en proceso**
+- **36 críticas**
+- **60 vencidas**
+- **40 en riesgo**
+
+También preparé una matriz para cruzar las operaciones por **área y prioridad**.
+
+Esto me permite detectar, por ejemplo, si un área empieza a concentrar demasiados casos de prioridad alta o crítica.
+
+Otro punto que quise analizar fue la antigüedad de las operaciones abiertas.
+
+Las separé en:
+
+- 0–2 días
+- 3–5 días
+- 6–10 días
+- 11+ días
+
+Porque dos operaciones abiertas no necesariamente tienen la misma urgencia. Una que acaba de ingresar y otra que lleva varios días esperando deberían verse de manera distinta.
+
+En la parte inferior derecha agregué una **cola prioritaria de atención**.
+
+La idea es tener a la vista los casos que requieren una revisión más cercana y no depender solamente de los indicadores generales.
+
+---
+
+## 4️ Detalle de Operación
+
+![Detalle de Operación](Proyecto_GestionOperacional/2.-POWER%20BI/CAPTURAS/dashboard-detalle-operacion.png)
+
+La última página responde a una pregunta mucho más específica:
+
+**¿Qué está pasando con esta operación?**
+
+Aquí puedo ingresar un `OperacionID` y revisar toda su información desde una sola pantalla.
+
+Entre los datos que puedo consultar están:
+
+- estado;
+- prioridad;
+- área;
+- responsable;
+- tipo de operación;
+- canal de ingreso;
+- cargo;
+- fecha de creación;
+- fecha de compromiso;
+- fecha de cierre;
+- horas de SLA;
+- comentario.
+
+También preparé un indicador para comparar el tiempo transcurrido con el límite de SLA.
+
+En la captura estoy revisando la operación `10284`.
+
+La operación aparece como **cerrada**, con prioridad **alta** y dentro del SLA.
+
+Tenía un límite de **24 horas** y registró **16 horas transcurridas**, equivalente al **67 % del tiempo disponible**.
+
+El reporte también muestra un mensaje de acuerdo con la situación de la operación.
+
+En este caso indica que ya está cerrada y no requiere una acción inmediata.
+
+Esta página me gusta porque cierra el recorrido del dashboard: puedo empezar viendo 500 operaciones y terminar revisando una sola.
+
+---
+
+##  ¿Cómo se puede recorrer el análisis?
+
+Una forma de leer el reporte sería esta:
+
+Primero entro al **Resumen Ejecutivo** y veo que el cumplimiento general del SLA está en 80 %.
+
+Después voy a **SLA y Alertas** para revisar qué áreas tienen menor cumplimiento y cuáles son los casos atrasados.
+
+Si quiero saber dónde se está concentrando la carga, paso a **Gestión Operativa**.
+
+Y cuando encuentro una operación que quiero revisar, voy a **Detalle de Operación** e ingreso su identificador.
+
+Ese fue uno de los puntos que más cuidé al diseñar el reporte: que las páginas no fueran independientes, sino que siguieran una lógica de análisis.
+
+---
+
+##  Estructura del repositorio
+
+Organicé el proyecto de esta manera:
 
 ```text
 Proyecto_GestionOperacional/
@@ -100,36 +424,113 @@ Proyecto_GestionOperacional/
 │
 ├── 2.-POWER BI/
 │   ├── Dashboard_Gestion_Operacional.pbix
+│   │
+│   ├── CAPTURAS/
+│   │   ├── dashboard-resumen-ejecutivo.png
+│   │   ├── dashboard-sla-alertas.png
+│   │   ├── dashboard-gestion-operativa.png
+│   │   └── dashboard-detalle-operacion.png
+│   │
 │   └── FONDOS/
 │
 └── 3.-DOCUMENTACION/
     └── Documentacion_Centro_Control_Operacional.docx
 ```
 
-## Cómo revisar el proyecto
+---
 
-Para ejecutar la parte de SQL se deben abrir los archivos respetando el orden numérico:
+##  Cómo probar el proyecto
 
-1. Crear la base de datos y sus tablas.
-2. Insertar los datos simulados.
-3. Ejecutar las consultas de validación.
-4. Crear las vistas SQL.
-5. Crear los procedimientos almacenados.
+Los scripts SQL están numerados según el orden en que deben ejecutarse.
 
-Después se puede abrir el archivo `Dashboard_Gestion_Operacional.pbix` en Power BI Desktop. Si la conexión corresponde a otro equipo o servidor, será necesario actualizar el origen de datos.
+### 1. Crear la base de datos
 
-## Resultado final
+`01_Creacion_Base_Datos.sql`
 
-Al finalizar el proyecto logré conectar SQL Server con Power BI y desarrollar un reporte de cuatro páginas para controlar operaciones, SLA y alertas.
+Crea la base de datos, las tablas y sus relaciones.
 
-Este proyecto me permitió reforzar mis conocimientos en creación de bases de datos, relaciones entre tablas, consultas SQL, validación de información, procedimientos almacenados, modelado de datos, medidas DAX y diseño de reportes.
+### 2. Cargar los datos
 
-## Mejoras futuras
+`02_Insercion_Datos.sql`
 
-Como siguientes mejoras me gustaría:
+Carga las 500 operaciones simuladas del proyecto.
 
-* Automatizar la actualización de la información.
-* Publicar el reporte en Power BI Service.
-* Incorporar un historial de cambios por operación.
-* Crear notificaciones para las operaciones próximas a vencer.
-* Practicar la construcción de procesos ETL con herramientas cloud.
+### 3. Revisar la calidad de los datos
+
+`03_Consultas_Validacion.sql`
+
+Contiene las consultas que preparé para detectar problemas en la información.
+
+### 4. Crear las vistas
+
+`04_Vistas_SQL.sql`
+
+Crea las vistas que forman parte del análisis.
+
+### 5. Crear los procedimientos almacenados
+
+`05_Stored_Procedures.sql`
+
+Crea los procedimientos almacenados del proyecto.
+
+Después de ejecutar la parte de SQL se puede abrir:
+
+`Dashboard_Gestion_Operacional.pbix`
+
+desde **Power BI Desktop**.
+
+Si se abre desde otro equipo o desde otra instancia de SQL Server, será necesario cambiar la conexión al origen de datos.
+
+---
+
+##  ¿Con qué me quedo de este proyecto?
+
+Lo que más me interesaba era practicar un proyecto de datos de principio a fin.
+
+No quería quedarme solamente en:
+
+**“Tengo una base de datos”**
+
+o:
+
+**“Hice un dashboard en Power BI”.**
+
+Quería conectar las dos partes.
+
+Durante el proyecto pasé por:
+
+**SQL Server → validación de datos → modelado → Power Query → DAX → Power BI → análisis**
+
+Eso me permitió entender mejor algo que antes veía por separado: un dashboard depende mucho del trabajo que existe detrás.
+
+Las relaciones, la calidad de los datos, las reglas del SLA y las medidas que se preparan terminan afectando directamente lo que después vemos en una gráfica o en un KPI.
+
+---
+
+##  Conocimientos que puse en práctica
+
+`SQL Server` · `T-SQL` · `Modelado de Datos` · `Calidad de Datos` · `Vistas SQL` · `Stored Procedures` · `Power Query` · `DAX` · `Power BI` · `KPIs` · `SLA` · `Análisis Operacional`
+
+---
+
+##  ¿Qué me gustaría agregar después?
+
+El proyecto todavía tiene espacio para seguir creciendo.
+
+Algunas cosas que me gustaría trabajar más adelante son:
+
+- automatizar la actualización de los datos;
+- publicar el dashboard en Power BI Service;
+- guardar un historial de cambios de cada operación;
+- crear alertas automáticas antes de que una operación venza;
+- trabajar un proceso de carga de datos más automatizado.
+
+La idea es seguir agregando mejoras poco a poco, siempre tratando de que tengan sentido dentro del caso y no agregar herramientas solamente por tener más tecnologías en el proyecto.
+
+---
+
+##  Sobre los datos
+
+Las **500 operaciones utilizadas en este proyecto son simuladas** y fueron creadas únicamente con fines de aprendizaje y demostración.
+
+No se trabajó con información real, privada o confidencial de ninguna empresa.
